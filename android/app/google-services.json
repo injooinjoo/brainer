@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471309772132",
+    "project_id": "brainer-ac992",
+    "storage_bucket": "brainer-ac992.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471309772132:android:01e46e1410d28115824671",
+        "android_client_info": {
+          "package_name": "com.beyond.brainer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDW1zpLBI2aODaHEj8eGMdXKT_YRdyaePQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
