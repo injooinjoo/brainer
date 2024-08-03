@@ -1,4 +1,3 @@
-// lib/screens/quiz_detail_screen.dart
 import 'package:flutter/material.dart';
 import '../models/quiz.dart';
 import 'quiz_solving_screen.dart';
@@ -14,59 +13,40 @@ class QuizDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(quiz.title),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: quiz.questions.length,
-              itemBuilder: (context, index) {
-                Question question = quiz.questions[index];
-                return Card(
-                  margin: EdgeInsets.all(8),
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '질문 ${index + 1}: ${question.text}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        ...question.options.asMap().entries.map((entry) {
-                          int optionIndex = entry.key;
-                          String option = entry.value;
-                          return Text(
-                            '${optionIndex + 1}. $option ${optionIndex == question.correctOptionIndex ? '(정답)' : ''}',
-                            style: TextStyle(
-                              color: optionIndex == question.correctOptionIndex
-                                  ? Colors.green
-                                  : null,
-                            ),
-                          );
-                        }).toList(),
-                      ],
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('카테고리: ${quiz.category}'),
+            SizedBox(height: 8),
+            Text('난이도: ${quiz.difficulty}'),
+            SizedBox(height: 8),
+            Text('문제 수: ${quiz.questions.length}'),
+            SizedBox(height: 24),
+            Text(
+              '퀴즈 정보:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('이 퀴즈는 ${quiz.questions.length}개의 문제로 구성되어 있습니다.'),
+            Text('난이도는 ${quiz.difficulty}입니다.'),
+            Spacer(),
+            Center(
+              child: ElevatedButton(
+                child: Text('퀴즈 풀기'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuizSolvingScreen(quiz: quiz),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: ElevatedButton(
-              child: Text('퀴즈 풀기'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuizSolvingScreen(quiz: quiz),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

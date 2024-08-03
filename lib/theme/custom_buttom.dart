@@ -1,17 +1,15 @@
-// lib/widgets/custom_button.dart
-
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isPrimary;
 
   const CustomButton({
     Key? key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.isPrimary = true,
   }) : super(key: key);
 
@@ -20,9 +18,14 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: isPrimary ? Colors.white : AppTheme.textColor,
-        backgroundColor:
-            isPrimary ? AppTheme.primaryColor : AppTheme.backgroundColor,
+        foregroundColor: isPrimary
+            ? Colors.white
+            : (onPressed != null ? AppTheme.textColor : Colors.grey),
+        backgroundColor: isPrimary
+            ? (onPressed != null ? AppTheme.primaryColor : Colors.grey[300])
+            : (onPressed != null ? AppTheme.backgroundColor : Colors.grey[300]),
+        disabledForegroundColor: Colors.grey,
+        disabledBackgroundColor: Colors.grey[300],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
         ),

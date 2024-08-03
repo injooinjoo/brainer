@@ -12,7 +12,12 @@
           "package_name": "com.beyond.brainer"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "471309772132-61ler0938o2pocdp2pd4f47ht1bk5dqg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDW1zpLBI2aODaHEj8eGMdXKT_YRdyaePQ"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471309772132-61ler0938o2pocdp2pd4f47ht1bk5dqg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "471309772132-8l2miqe0hj4a88mmihi6pc1792vck5c8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.brainerFlutter"
+              }
+            }
+          ]
         }
       }
     }

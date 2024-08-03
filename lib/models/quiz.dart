@@ -1,11 +1,12 @@
 // lib/models/quiz.dart
 
 class Quiz {
-  String id;
-  String title;
-  List<Question> questions;
-  String category;
-  String difficulty;
+  String id; // final 제거
+  final String title;
+  final List<Question> questions;
+  final String category;
+  final String difficulty;
+  final String? description;
 
   Quiz({
     required this.id,
@@ -13,7 +14,27 @@ class Quiz {
     required this.questions,
     required this.category,
     required this.difficulty,
+    this.description,
   });
+
+  // copyWith 메서드 추가
+  Quiz copyWith({
+    String? id,
+    String? title,
+    List<Question>? questions,
+    String? category,
+    String? difficulty,
+    String? description,
+  }) {
+    return Quiz(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      questions: questions ?? this.questions,
+      category: category ?? this.category,
+      difficulty: difficulty ?? this.difficulty,
+      description: description ?? this.description,
+    );
+  }
 
   factory Quiz.fromMap(Map<String, dynamic> map) {
     return Quiz(

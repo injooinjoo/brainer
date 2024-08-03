@@ -1,21 +1,46 @@
-// lib/providers/quiz_provider.dart
+// provider/quiz_provider.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/quiz.dart';
+import 'package:flutter/foundation.dart';
 
 class QuizProvider with ChangeNotifier {
   List<Quiz> _quizzes = [];
+
   List<Quiz> get quizzes => _quizzes;
+  String _selectedCategory = 'All';
+  String _selectedDifficulty = 'All';
+
+  List<Quiz> get filteredQuizzes {
+    return _quizzes.where((quiz) {
+      bool categoryMatch =
+          _selectedCategory == 'All' || quiz.category == _selectedCategory;
+      bool difficultyMatch = _selectedDifficulty == 'All' ||
+          quiz.difficulty == _selectedDifficulty;
+      return categoryMatch && difficultyMatch;
+    }).toList();
+  }
+
+  void setCategory(String category) {
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
+  void setDifficulty(String difficulty) {
+    _selectedDifficulty = difficulty;
+    notifyListeners();
+  }
 
   Future<void> fetchQuizzes() async {
     try {
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('quizzes').get();
+
       _quizzes = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; // doc.id를 map에 추가
-        return Quiz.fromMap(data);
+        return Quiz.fromMap(data).copyWith(id: doc.id);
       }).toList();
+
       notifyListeners();
     } catch (e) {
       print('Error fetching quizzes: $e');
@@ -27,8 +52,11 @@ class QuizProvider with ChangeNotifier {
       DocumentReference docRef = await FirebaseFirestore.instance
           .collection('quizzes')
           .add(quiz.toJson());
-      quiz.id = docRef.id;
-      _quizzes.add(quiz);
+
+      Quiz updatedQuiz = quiz.copyWith(id: docRef.id);
+
+      _quizzes.add(updatedQuiz);
+
       notifyListeners();
     } catch (e) {
       print('Error adding quiz: $e');
