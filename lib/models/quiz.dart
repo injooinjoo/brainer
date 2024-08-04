@@ -1,101 +1,129 @@
-// lib/models/quiz.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Quiz {
-  String id; // final 제거
+  final String id;
   final String title;
-  final List<Question> questions;
+  final String description;
   final String category;
   final String difficulty;
-  final String? description;
+  final List<Question> questions;
 
   Quiz({
     required this.id,
     required this.title,
-    required this.questions,
+    required this.description,
     required this.category,
     required this.difficulty,
-    this.description,
+    required this.questions,
   });
 
-  // copyWith 메서드 추가
-  Quiz copyWith({
-    String? id,
-    String? title,
-    List<Question>? questions,
-    String? category,
-    String? difficulty,
-    String? description,
-  }) {
+  // Firestore에서 데이터를 가져올 때 사용할 팩토리 메서드
+  factory Quiz.fromMap(Map<String, dynamic> data, {String id = ''}) {
     return Quiz(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      questions: questions ?? this.questions,
-      category: category ?? this.category,
-      difficulty: difficulty ?? this.difficulty,
-      description: description ?? this.description,
+      id: id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
+      category: data['category'] ?? '',
+      difficulty: data['difficulty'] ?? '',
+      questions: (data['questions'] as List<dynamic>?)
+              ?.map((q) => Question.fromMap(q))
+              .toList() ??
+          [],
     );
   }
 
-  factory Quiz.fromMap(Map<String, dynamic> map) {
+  // JSON 데이터를 Quiz 객체로 변환할 때 사용할 팩토리 메서드
+  factory Quiz.fromJson(Map<String, dynamic> json) {
     return Quiz(
-      id: map['id'] ?? '',
-      title: map['title'] ?? '',
-      questions: (map['questions'] as List? ?? [])
-          .map((q) => Question.fromMap(q as Map<String, dynamic>))
-          .toList(),
-      category: map['category'] ?? '',
-      difficulty: map['difficulty'] ?? '',
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      category: json['category'] ?? '',
+      difficulty: json['difficulty'] ?? '',
+      questions: (json['questions'] as List<dynamic>?)
+              ?.map((q) => Question.fromJson(q))
+              .toList() ??
+          [],
     );
   }
 
+  // Quiz 객체를 JSON 데이터로 변환할 때 사용할 메서드
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
-      'questions': questions.map((q) => q.toJson()).toList(),
+      'description': description,
       'category': category,
       'difficulty': difficulty,
+      'questions': questions.map((q) => q.toJson()).toList(),
     };
+  }
+
+  // Quiz 객체를 수정할 때 사용할 메서드
+  Quiz copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? category,
+    String? difficulty,
+    List<Question>? questions,
+  }) {
+    return Quiz(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      difficulty: difficulty ?? this.difficulty,
+      questions: questions ?? this.questions,
+    );
   }
 }
 
 class Question {
-  String id;
-  String text;
-  List<String> options;
-  int correctOptionIndex;
+  final String text;
+  final List<String> options;
+  final int correctOptionIndex;
+  final String? explanation; // 추가된 필드: 정답에 대한 설명
+  final String? imageUrl; // 추가된 필드: 질문에 포함될 이미지 URL
 
   Question({
-    required this.id,
     required this.text,
     required this.options,
     required this.correctOptionIndex,
+    this.explanation, // 선택적 필드
+    this.imageUrl, // 선택적 필드
   });
 
-  factory Question.fromMap(Map<String, dynamic> map) {
+  // Firestore에서 데이터를 가져올 때 사용할 팩토리 메서드
+  factory Question.fromMap(Map<String, dynamic> data) {
     return Question(
-      id: map['id'] ?? '',
-      text: map['text'] ?? '',
-      options: List<String>.from(map['options'] ?? []),
-      correctOptionIndex: map['correctOptionIndex'] ?? 0,
+      text: data['text'] ?? '',
+      options: List<String>.from(data['options'] ?? []),
+      correctOptionIndex: data['correctOptionIndex'] ?? 0,
+      explanation: data['explanation'], // 선택적 필드 매핑
+      imageUrl: data['imageUrl'], // 선택적 필드 매핑
     );
   }
 
+  // JSON 데이터를 Question 객체로 변환할 때 사용할 팩토리 메서드
+  factory Question.fromJson(Map<String, dynamic> json) {
+    return Question(
+      text: json['text'] ?? '',
+      options: List<String>.from(json['options'] ?? []),
+      correctOptionIndex: json['correctOptionIndex'] ?? 0,
+      explanation: json['explanation'], // 선택적 필드 매핑
+      imageUrl: json['imageUrl'], // 선택적 필드 매핑
+    );
+  }
+
+  // Question 객체를 JSON 데이터로 변환할 때 사용할 메서드
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'text': text,
       'options': options,
       'correctOptionIndex': correctOptionIndex,
+      'explanation': explanation, // 선택적 필드 포함
+      'imageUrl': imageUrl, // 선택적 필드 포함
     };
-  }
-
-  factory Question.empty() {
-    return Question(
-      id: '',
-      text: '',
-      options: [],
-      correctOptionIndex: -1,
-    );
   }
 }

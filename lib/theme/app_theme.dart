@@ -1,55 +1,69 @@
-// lib/theme/app_theme.dart
-
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFF1DB954); // Spotify Green
-  static const Color backgroundColor = Color(0xFFF2F2F7); // iOS Light Gray
-  static const Color textColor = Color(0xFF000000);
-  static const Color subtleTextColor = Color(0xFF8E8E93); // iOS Gray
+  static const Color primaryColor = Color(0xFF054bb4); // Cobalt
+  static const Color backgroundColor = Color(0xFF658cc2); // Ship Cove
+  static const Color textColor = Color(0xFF5d6169); // Shuttle Gray
+  static const Color subtleTextColor = Color(0xFF2e5caf); // Azure
+  static const Color errorColor = Colors.red;
 
+  // Text styles
   static const TextStyle headlineStyle = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
     color: textColor,
-    fontFamily: 'SF Pro Display', // iOS-like font
+    fontFamily: 'TimesNewRoman',
   );
 
   static const TextStyle bodyStyle = TextStyle(
     fontSize: 16,
+    fontWeight: FontWeight.normal,
     color: textColor,
-    fontFamily: 'SF Pro Text', // iOS-like font
+    fontFamily: 'TimesNewRoman',
   );
 
   static const TextStyle captionStyle = TextStyle(
     fontSize: 12,
+    fontWeight: FontWeight.normal,
     color: subtleTextColor,
-    fontFamily: 'SF Pro Text', // iOS-like font
+    fontFamily: 'TimesNewRoman',
   );
 
-  static final ThemeData themeData = ThemeData(
-    primaryColor: primaryColor,
-    scaffoldBackgroundColor: backgroundColor,
-    appBarTheme: AppBarTheme(
-      backgroundColor: backgroundColor,
-      elevation: 0,
-      iconTheme: IconThemeData(color: textColor),
-      titleTextStyle: headlineStyle.copyWith(fontSize: 17),
-    ),
-    textTheme: TextTheme(
-      displayLarge: headlineStyle,
-      bodyLarge: bodyStyle,
-      bodySmall: captionStyle,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+  static ThemeData get lightTheme {
+    return ThemeData(
+      primaryColor: primaryColor,
+      textTheme: TextTheme(
+        displayLarge: headlineStyle,
+        bodyLarge: bodyStyle,
+        bodyMedium: bodyStyle,
+        bodySmall: captionStyle, // captionStyle을 bodySmall로 매핑
       ),
-    ),
-  );
+      buttonTheme: ButtonThemeData(
+        buttonColor: primaryColor,
+        textTheme: ButtonTextTheme.primary,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: subtleTextColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor),
+        ),
+        hintStyle: TextStyle(color: subtleTextColor),
+      ),
+      colorScheme: ColorScheme(
+        brightness: Brightness.light,
+        primary: primaryColor,
+        onPrimary: Colors.white,
+        secondary: subtleTextColor,
+        onSecondary: Colors.white,
+        error: errorColor,
+        onError: Colors.white,
+        background: backgroundColor,
+        onBackground: textColor,
+        surface: Colors.white,
+        onSurface: textColor,
+      ).copyWith(background: backgroundColor),
+    );
+  }
 }

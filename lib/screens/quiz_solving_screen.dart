@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../models/quiz.dart';
 import 'quiz_result_screen.dart';
+import '../widgets/sharing_widget.dart';
 
 class QuizSolvingScreen extends StatefulWidget {
   final Quiz quiz;
@@ -137,6 +138,10 @@ class _QuizSolvingScreenState extends State<QuizSolvingScreen> {
     }
   }
 
+  String _generateShareContent() {
+    return '나는 지금 "${widget.quiz.title}" 퀴즈를 풀고 있어요! 함께 도전해보세요!';
+  }
+
   @override
   Widget build(BuildContext context) {
     Question currentQuestion = widget.quiz.questions[_currentQuestionIndex];
@@ -192,6 +197,11 @@ class _QuizSolvingScreenState extends State<QuizSolvingScreen> {
                 ..._buildAnswerOptions(currentQuestion),
                 const SizedBox(height: 16),
                 _buildNavigationButtons(),
+                const SizedBox(height: 16),
+                SharingWidget(
+                  content: _generateShareContent(),
+                  url: 'https://yourapp.com/quiz/${widget.quiz.id}',
+                ),
               ],
             ),
           ),

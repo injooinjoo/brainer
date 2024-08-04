@@ -18,18 +18,12 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: isPrimary
-            ? Colors.white
-            : (onPressed != null ? AppTheme.textColor : Colors.grey),
-        backgroundColor: isPrimary
-            ? (onPressed != null ? AppTheme.primaryColor : Colors.grey[300])
-            : (onPressed != null ? AppTheme.backgroundColor : Colors.grey[300]),
-        disabledForegroundColor: Colors.grey,
-        disabledBackgroundColor: Colors.grey[300],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24.0),
+        foregroundColor: isPrimary ? Colors.white : Colors.grey,
+        backgroundColor: isPrimary ? AppTheme.primaryColor : Colors.grey,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       ),
       child: Text(text),
     );

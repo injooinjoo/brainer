@@ -1,3 +1,5 @@
+// lib/screens/leaderboard_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/leaderboard_provider.dart';
@@ -39,20 +41,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('리더보드를 불러오는 중 오류가 발생했습니다.'),
+                        Text('Error loading leaderboard'),
                         SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
                             leaderboardProvider.fetchLeaderboard();
                           },
-                          child: Text('다시 시도'),
+                          child: Text('Retry'),
                         ),
                       ],
                     ),
                   );
                 }
                 if (leaderboardProvider.entries.isEmpty) {
-                  return Center(child: Text('데이터가 없습니다.'));
+                  return Center(child: Text('No data available'));
                 }
                 return ListView.builder(
                   itemCount: leaderboardProvider.entries.length,

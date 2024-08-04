@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/exam_provider.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -10,43 +12,18 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  String _nickname = '';
+  String _selectedExamId = '';
   bool _isLoading = false;
-
-  void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _email,
-          password: _password,
-        );
-        Navigator.of(context).pop(); // 회원가입 후 이전 화면(로그인 화면)으로 돌아갑니다.
-      } on FirebaseAuthException catch (e) {
-        String message = '회원가입에 실패했습니다.';
-        if (e.code == 'weak-password') {
-          message = '비밀번호가 너무 약합니다.';
-        } else if (e.code == 'email-already-in-use') {
-          message = '이미 사용 중인 이메일 주소입니다.';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final examProvider = Provider.of<ExamProvider>(context);
+    final exams = examProvider.exams;
+
     return Scaffold(
       appBar: AppBar(title: Text('회원가입')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -77,6 +54,36 @@ class _SignupScreenState extends State<SignupScreen> {
                 },
                 onSaved: (value) => _password = value!,
               ),
+              TextFormField(
+                decoration: InputDecoration(labelText: '닉네임'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '닉네임을 입력해주세요.';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _nickname = value!,
+              ),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: '목표 시험'),
+                items: exams.map((exam) {
+                  return DropdownMenuItem(
+                    value: exam.id,
+                    child: Text(exam.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedExamId = value!;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '목표 시험을 선택해주세요.';
+                  }
+                  return null;
+                },
+              ),
               SizedBox(height: 20),
               _isLoading
                   ? CircularProgressIndicator()
@@ -84,10 +91,47 @@ class _SignupScreenState extends State<SignupScreen> {
                       onPressed: _submitForm,
                       child: Text('회원가입'),
                     ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<AuthProvider>().signInWithGoogle();
+                },
+                child: Text('Google로 가입하기'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<AuthProvider>().signInWithFacebook();
+                },
+                child: Text('Facebook으로 가입하기'),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await context
+            .read<AuthProvider>()
+            .createUser(_email, _password, _nickname);
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('회원가입에 실패했습니다: ${e.toString()}')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }

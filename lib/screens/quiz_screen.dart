@@ -1,127 +1,200 @@
-// lib/screens/quiz_screen.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/quiz_provider.dart';
 import '../models/quiz.dart';
-import '../theme/app_theme.dart';
-import 'quiz_result_screen.dart';
+import 'quiz_registration_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  final Quiz? quiz;
-
-  const QuizScreen({Key? key, this.quiz}) : super(key: key);
-
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  int currentQuestionIndex = 0;
-  List<int?> userAnswers = [];
-  late Stopwatch stopwatch;
+  int _currentQuizIndex = 0;
+  int _currentQuestionIndex = 0;
+  int _score = 0;
+  bool _showingAnswer = false;
+  bool _lastAnswerCorrect = false;
 
   @override
   void initState() {
     super.initState();
-    stopwatch = Stopwatch()..start();
-    if (widget.quiz != null) {
-      userAnswers = List.filled(widget.quiz!.questions.length, null);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<QuizProvider>(context, listen: false).fetchQuizzes();
+    });
   }
 
-  void answerQuestion(int answerIndex) {
-    if (widget.quiz == null) return;
+  void _answerQuestion(bool isCorrect) {
     setState(() {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      if (currentQuestionIndex < widget.quiz!.questions.length - 1) {
-        currentQuestionIndex++;
+      _lastAnswerCorrect = isCorrect;
+      if (isCorrect) {
+        _score++;
+      }
+      _showingAnswer = true;
+    });
+  }
+
+  void _moveToNextQuestion() {
+    setState(() {
+      _showingAnswer = false;
+      _currentQuestionIndex++;
+      if (_currentQuestionIndex >= _getCurrentQuiz().questions.length) {
+        _currentQuestionIndex = 0;
+        _currentQuizIndex++;
       }
     });
   }
 
-  void submitQuiz() {
-    if (widget.quiz == null) return;
+  Quiz _getCurrentQuiz() {
+    final quizzes = Provider.of<QuizProvider>(context, listen: false).quizzes;
+    return quizzes[_currentQuizIndex];
+  }
 
-    stopwatch.stop(); // 퀴즈 풀이 종료 시간 기록
+  @override
+  Widget build(BuildContext context) {
+    final quizProvider = Provider.of<QuizProvider>(context);
+    final quizzes = quizProvider.quizzes;
 
-    int score = 0;
-    for (int i = 0; i < widget.quiz!.questions.length; i++) {
-      if (userAnswers[i] == widget.quiz!.questions[i].correctOptionIndex) {
-        score++;
-      }
+    if (quizzes.isEmpty) {
+      return _buildLoadingScreen();
     }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuizResultScreen(
-          quiz: widget.quiz!,
-          userAnswers: userAnswers,
-          score: score,
-          duration: stopwatch.elapsed, // 측정된 시간 전달
+    if (_currentQuizIndex >= quizzes.length) {
+      return _buildQuizCompletedScreen();
+    }
+
+    final currentQuiz = _getCurrentQuiz();
+    final currentQuestion = currentQuiz.questions[_currentQuestionIndex];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Quiz'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => _navigateToQuizRegistration(context),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Quiz ${_currentQuizIndex + 1} - Question ${_currentQuestionIndex + 1} of ${currentQuiz.questions.length}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            SizedBox(height: 20),
+            Text(
+              currentQuestion.text,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            SizedBox(height: 20),
+            if (!_showingAnswer) ...[
+              ...currentQuestion.options.map((option) {
+                return ElevatedButton(
+                  onPressed: () => _answerQuestion(option ==
+                      currentQuestion
+                          .options[currentQuestion.correctOptionIndex]),
+                  child: Text(option),
+                );
+              }).toList(),
+            ] else ...[
+              _buildAnswerFeedback(currentQuestion),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _moveToNextQuestion,
+                child: Text('Next Question'),
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (widget.quiz == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('Quiz')),
-        body: Center(child: Text('No quiz available')),
-      );
-    }
+  Widget _buildAnswerFeedback(Question question) {
+    return Column(
+      children: [
+        Icon(
+          _lastAnswerCorrect ? Icons.check_circle : Icons.cancel,
+          color: _lastAnswerCorrect ? Colors.green : Colors.red,
+          size: 48,
+        ),
+        SizedBox(height: 10),
+        Text(
+          _lastAnswerCorrect ? 'Correct!' : 'Incorrect',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: _lastAnswerCorrect ? Colors.green : Colors.red,
+          ),
+        ),
+        SizedBox(height: 20),
+        Text(
+          'Correct Answer: ${question.options[question.correctOptionIndex]}',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        Text(
+          'Explanation: ${question.explanation}',
+          style: TextStyle(fontSize: 16),
+        ),
+      ],
+    );
+  }
 
+  Widget _buildLoadingScreen() {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.quiz!.title),
+        title: Text('Quiz'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => _navigateToQuizRegistration(context),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildQuizCompletedScreen() {
+    return Scaffold(
+      appBar: AppBar(title: Text('Quiz Completed')),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Question ${currentQuestionIndex + 1}/${widget.quiz!.questions.length}',
-              style: AppTheme.bodyStyle,
-              textAlign: TextAlign.center,
+              'You scored $_score out of ${Provider.of<QuizProvider>(context, listen: false).quizzes.expand((quiz) => quiz.questions).length}',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            SizedBox(height: 24),
-            Text(
-              widget.quiz!.questions[currentQuestionIndex].text,
-              style: AppTheme.headlineStyle,
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _restartQuiz,
+              child: Text('Restart Quiz'),
             ),
-            SizedBox(height: 24),
-            ...widget.quiz!.questions[currentQuestionIndex].options
-                .asMap()
-                .entries
-                .map((entry) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: ElevatedButton(
-                  onPressed: () => answerQuestion(entry.key),
-                  child: Text(entry.value),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        userAnswers[currentQuestionIndex] == entry.key
-                            ? AppTheme.primaryColor
-                            : Colors.white,
-                    foregroundColor:
-                        userAnswers[currentQuestionIndex] == entry.key
-                            ? Colors.white
-                            : AppTheme.textColor,
-                  ),
-                ),
-              );
-            }).toList(),
-            if (currentQuestionIndex == widget.quiz!.questions.length - 1)
-              ElevatedButton(
-                onPressed: submitQuiz,
-                child: Text('Submit Quiz'),
-              ),
           ],
         ),
       ),
     );
+  }
+
+  void _navigateToQuizRegistration(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => QuizRegistrationScreen()),
+    );
+  }
+
+  void _restartQuiz() {
+    setState(() {
+      _currentQuizIndex = 0;
+      _currentQuestionIndex = 0;
+      _score = 0;
+      _showingAnswer = false;
+    });
   }
 }

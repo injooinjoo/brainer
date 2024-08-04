@@ -6,6 +6,8 @@ class Goal {
   String description;
   DateTime dueDate;
   bool isCompleted;
+  String examId; // 추가: 시험 ID
+  DateTime? examDate; // 추가: 시험 날짜
 
   Goal({
     required this.id,
@@ -13,6 +15,8 @@ class Goal {
     required this.description,
     required this.dueDate,
     this.isCompleted = false,
+    required this.examId,
+    this.examDate,
   });
 
   factory Goal.fromJson(Map<String, dynamic> json) {
@@ -22,6 +26,9 @@ class Goal {
       description: json['description'],
       dueDate: DateTime.parse(json['dueDate']),
       isCompleted: json['isCompleted'] ?? false,
+      examId: json['examId'],
+      examDate:
+          json['examDate'] != null ? DateTime.parse(json['examDate']) : null,
     );
   }
 
@@ -32,6 +39,8 @@ class Goal {
       'description': description,
       'dueDate': dueDate.toIso8601String(),
       'isCompleted': isCompleted,
+      'examId': examId,
+      'examDate': examDate?.toIso8601String(),
     };
   }
 }

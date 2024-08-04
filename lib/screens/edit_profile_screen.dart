@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import '../models/user.dart';
-import '../providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
+import '../providers/auth_provider.dart';
+import '../providers/user_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   @override
@@ -11,75 +9,89 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late TextEditingController _nameController;
-  XFile? _image;
+  final _formKey = GlobalKey<FormState>();
+  late String _name;
+  late String _email;
+  late String _displayName;
 
   @override
   void initState() {
     super.initState();
-    final user = Provider.of<UserProvider>(context, listen: false).user!;
-    _nameController = TextEditingController(text: user.name);
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = image;
-      });
-    }
-  }
-
-  void _saveChanges() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user!;
+    _name = userProvider.user?.name ?? '';
+    _email = userProvider.user?.email ?? '';
+    _displayName = userProvider.displayName;
+  }
 
-    user.name = _nameController.text;
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    if (_image != null) {
-      // TODO: Upload image to Firebase Storage and get URL
-      // user.photoUrl = uploadedImageUrl;
+        await authProvider.updateUserProfile(_name, _email);
+        await userProvider.updateDisplayName(_displayName);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profile updated successfully')));
+        Navigator.pop(context);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update profile: $e')));
+      }
     }
-
-    await userProvider.updateUser(user);
-    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user!;
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('프로필 편집'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveChanges,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      appBar: AppBar(title: Text('Edit Profile')),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: EdgeInsets.all(16.0),
           children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: _image != null
-                    ? FileImage(File(_image!.path))
-                    : (user.photoUrl != null
-                            ? NetworkImage(user.photoUrl!)
-                            : AssetImage('assets/default_avatar.png'))
-                        as ImageProvider,
-              ),
+            TextFormField(
+              initialValue: _displayName,
+              decoration: InputDecoration(labelText: 'Display Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your display name';
+                }
+                return null;
+              },
+              onSaved: (value) => _displayName = value!,
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: '이름'),
+            TextFormField(
+              initialValue: _name,
+              decoration: InputDecoration(labelText: 'Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your name';
+                }
+                return null;
+              },
+              onSaved: (value) => _name = value!,
+            ),
+            TextFormField(
+              initialValue: _email,
+              decoration: InputDecoration(labelText: 'Email'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                if (!value.contains('@')) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+              onSaved: (value) => _email = value!,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _submitForm,
+              child: Text('Update Profile'),
             ),
           ],
         ),

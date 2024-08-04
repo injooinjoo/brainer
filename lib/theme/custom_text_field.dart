@@ -1,5 +1,3 @@
-// lib/widgets/custom_text_field.dart
-
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -19,16 +17,15 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: AppTheme.captionStyle,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+        hintStyle: TextStyle(color: AppTheme.subtleTextColor),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.subtleTextColor),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppTheme.primaryColor),
+        ),
       ),
+      style: TextStyle(color: AppTheme.textColor),
     );
   }
 }

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -20,9 +22,46 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.471309772132-8l2miqe0hj4a88mmihi6pc1792vck5c8</string>
+				<string>twitterkit-{CONSUMER_KEY}</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FacebookAppID</key>
+	<string>2631971280336817</string>
+	<key>FacebookClientToken</key>
+	<string>62db22eabd34f83e947700e7139c30ab</string>
+	<key>FacebookDisplayName</key>
+	<string>BRAINER</string>
+	<key>GIDClientID</key>
+	<string>471309772132-8l2miqe0hj4a88mmihi6pc1792vck5c8.apps.googleusercontent.com</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>kakaolink</string>
+		<string>instagram-stories</string>
+		<string>kakaokompassauth</string>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>lineauth2</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to update your profile picture.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -41,30 +80,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>GIDClientID</key>
-	<string>471309772132-8l2miqe0hj4a88mmihi6pc1792vck5c8.apps.googleusercontent.com</string>
-	
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.471309772132-8l2miqe0hj4a88mmihi6pc1792vck5c8</string>
-			</array>
-		</dict>
-	</array>
-
-	<key>NSAppTransportSecurity</key>
-	<dict>
-	    <key>NSAllowsArbitraryLoads</key>
-	    <true/>
-	</dict>
-
 </dict>
 </plist>
