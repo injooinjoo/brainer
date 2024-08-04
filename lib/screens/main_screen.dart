@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import 'quiz_screen.dart';
+import 'vocabulary_screen.dart'; // 새로 추가한 단어 학습 화면
 import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
 import '../providers/auth_provider.dart';
@@ -18,10 +19,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-
   final List<Widget> _screens = [
     HomeScreen(),
     QuizScreen(),
+    VocabularyScreen(), // 새로 추가한 단어 학습 화면
     LeaderboardScreen(),
     ProfileScreen(),
   ];
@@ -62,6 +63,10 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.quiz),
             label: 'Quiz',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book), // 단어 학습을 나타내는 아이콘
+            label: 'Study',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.leaderboard),

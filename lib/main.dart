@@ -15,6 +15,7 @@ import 'providers/theme_provider.dart';
 import 'providers/language_provider.dart';
 import 'providers/friend_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/vocabulary_provider.dart';
 import 'screens/main_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -92,6 +93,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => FriendProvider()),
+        ChangeNotifierProvider(create: (context) => VocabularyProvider()),
         ChangeNotifierProvider(create: (context) => NotificationProvider()),
         StreamProvider<ConnectivityResult>(
           create: (_) => Connectivity()

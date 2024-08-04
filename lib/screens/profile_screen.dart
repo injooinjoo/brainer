@@ -46,102 +46,115 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    user?.name ?? 'Anonymous',
-                    style: Theme.of(context).textTheme.headlineSmall,
+        child: DefaultTabController(
+          length: 3,
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              user?.name ?? 'Anonymous',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.menu),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SettingsScreen()),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => _updateProfileImage(context),
+                              child: CircleAvatar(
+                                radius: 40,
+                                backgroundImage: _image != null
+                                    ? FileImage(_image!)
+                                    : (user?.photoUrl != null
+                                        ? NetworkImage(user!.photoUrl!)
+                                            as ImageProvider
+                                        : null),
+                                child:
+                                    (user?.photoUrl == null && _image == null)
+                                        ? Icon(Icons.person, size: 40)
+                                        : null,
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildStatColumn('0', 'Followers'),
+                                  _buildStatColumn(
+                                      quizRankingPercentage, 'Quiz Top'),
+                                  _buildStatColumn(
+                                      quizProvider.quizzes.length.toString(),
+                                      'Quiz'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditProfileScreen()),
+                                  );
+                                },
+                                child: Text('Edit Profile'),
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FriendScreen()),
+                                  );
+                                },
+                                child: Text('Friends'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.menu),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingsScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => _updateProfileImage(context),
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundImage: _image != null
-                          ? FileImage(_image!)
-                          : (user?.photoUrl != null
-                              ? NetworkImage(user!.photoUrl!) as ImageProvider
-                              : null),
-                      child: (user?.photoUrl == null && _image == null)
-                          ? Icon(Icons.person, size: 40)
-                          : null,
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatColumn('0', 'Followers'),
-                        _buildStatColumn(quizRankingPercentage, 'Quiz Top'),
-                        _buildStatColumn(
-                            quizProvider.quizzes.length.toString(), 'Quiz'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditProfileScreen()),
-                        );
-                      },
-                      child: Text('Edit Profile'),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => FriendScreen()),
-                        );
-                      },
-                      child: Text('Friends'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: DefaultTabController(
-                length: 3,
-                child: Column(
-                  children: [
+                ),
+                SliverPersistentHeader(
+                  delegate: _SliverAppBarDelegate(
                     TabBar(
                       tabs: [
                         Tab(icon: Icon(Icons.quiz), text: 'Quizzes'),
@@ -150,21 +163,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             text: 'Achievements'),
                         Tab(icon: Icon(Icons.flag), text: 'Goals'),
                       ],
+                      indicatorColor: Theme.of(context).primaryColor,
+                      labelColor: Theme.of(context).primaryColor,
+                      unselectedLabelColor: Colors.grey,
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _buildQuizzes(quizProvider),
-                          _buildAchievements(),
-                          _buildGoals(),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
+                  pinned: true,
                 ),
-              ),
+              ];
+            },
+            body: TabBarView(
+              children: [
+                _buildQuizzes(quizProvider),
+                _buildAchievements(),
+                _buildGoals(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -187,11 +202,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {'name': 'LSAT', 'progress': 0.6},
       {'name': 'GMAT', 'progress': 0.4},
       {'name': 'MCAT', 'progress': 0.3},
-      {'name': 'CLAT', 'progress': 0.5},
-      {'name': 'CAT', 'progress': 0.8},
-      {'name': 'MAT', 'progress': 0.2},
-      {'name': 'GATE', 'progress': 0.6},
-      {'name': 'JEE', 'progress': 0.9},
       {'name': 'NEET', 'progress': 0.7},
       {'name': 'SSC', 'progress': 0.5},
       {'name': 'UPSC', 'progress': 0.3},
@@ -209,18 +219,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {'name': 'CAIA', 'progress': 0.5},
       {'name': 'CPA', 'progress': 0.9},
       {'name': 'USMLE', 'progress': 0.4},
-      {'name': 'BAR', 'progress': 0.3},
-      {'name': 'PLAB', 'progress': 0.7},
-      {'name': 'DRCOG', 'progress': 0.8},
-      {'name': 'TSA', 'progress': 0.6},
-      {'name': 'BMAT', 'progress': 0.5},
-      {'name': 'STEP', 'progress': 0.4},
-      {'name': 'UCAT', 'progress': 0.3},
-      {'name': 'IMAT', 'progress': 0.6},
-      {'name': 'LNAT', 'progress': 0.7},
-      {'name': 'PAT', 'progress': 0.5},
-      {'name': 'HAT', 'progress': 0.8},
-      {'name': 'MAT (Cambridge)', 'progress': 0.9},
       {'name': 'GAMSAT', 'progress': 0.4},
       {'name': 'SSAT', 'progress': 0.7},
       {'name': 'ISEE', 'progress': 0.6},
@@ -234,7 +232,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {'name': 'TOEIC', 'progress': 0.9},
     ];
 
-    // Sort quizzes by progress in descending order
     quizzes.sort((a, b) => b['progress'].compareTo(a['progress']));
 
     return GridView.builder(
@@ -318,22 +315,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {'name': 'Biology Brain', 'icon': Icons.biotech},
       {'name': 'Geography Genius', 'icon': Icons.map},
       {'name': 'Coding Conqueror', 'icon': Icons.code},
-      {'name': 'Algebra Ace', 'icon': Icons.functions},
-      {'name': 'Geometry Giant', 'icon': Icons.square_foot},
-      {'name': 'Calculus Commander', 'icon': Icons.timeline},
-      {'name': 'Statistics Star', 'icon': Icons.bar_chart},
-      {'name': 'Philosophy Prodigy', 'icon': Icons.psychology},
-      {'name': 'Art Aficionado', 'icon': Icons.palette},
-      {'name': 'Music Maestro', 'icon': Icons.music_note},
-      {'name': 'Drama Diva', 'icon': Icons.theater_comedy},
-      {'name': 'Tech Titan', 'icon': Icons.computer},
-      {'name': 'Business Brain', 'icon': Icons.business_center},
-      {'name': 'Economics Expert', 'icon': Icons.account_balance},
-      {'name': 'Finance Guru', 'icon': Icons.attach_money},
-      {'name': 'Marketing Maven', 'icon': Icons.trending_up},
-      {'name': 'Psychology Sage', 'icon': Icons.psychology_alt},
-      {'name': 'Sociology Scholar', 'icon': Icons.people},
-      {'name': 'Law Luminary', 'icon': Icons.gavel},
       {'name': 'Engineering Expert', 'icon': Icons.build},
       {'name': 'Medical Master', 'icon': Icons.local_hospital},
       {'name': 'Nursing Nurturer', 'icon': Icons.health_and_safety},
@@ -436,25 +417,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {'name': 'Complete BMAT Section 2 Prep', 'progress': 0.5},
       {'name': 'Finish STEP Mathematics Practice', 'progress': 0.4},
       {'name': 'Prepare for UCAT Abstract Reasoning', 'progress': 0.3},
-      {'name': 'Review IMAT Biology Concepts', 'progress': 0.6},
-      {'name': 'Study for LNAT Essay Writing', 'progress': 0.7},
-      {'name': 'Complete PAT Physics Preparation', 'progress': 0.5},
-      {'name': 'Finish HAT History Analysis', 'progress': 0.8},
-      {'name': 'Prepare for MAT (Cambridge) Problem Solving', 'progress': 0.9},
-      {'name': 'Study for GAMSAT Science Section', 'progress': 0.4},
-      {'name': 'Complete SSAT Reading Comprehension', 'progress': 0.7},
-      {'name': 'Finish ISEE Math Achievement', 'progress': 0.6},
-      {'name': 'Prepare for SHSAT ELA', 'progress': 0.8},
-      {'name': 'Review PSAT Math Section', 'progress': 0.5},
-      {'name': 'Complete SBAC English Language Arts', 'progress': 0.9},
-      {'name': 'Finish AP Physics C: Mechanics', 'progress': 0.4},
-      {'name': 'Study for IB Chemistry HL', 'progress': 0.7},
-      {'name': 'Review O Levels Mathematics', 'progress': 0.6},
-      {'name': 'Prepare for A Levels Biology', 'progress': 0.8},
-      {'name': 'Complete TOEIC Listening Practice', 'progress': 0.9},
     ];
 
-    // Sort goals by progress in descending order
     goals.sort((a, b) => b['progress'].compareTo(a['progress']));
 
     return GridView.builder(
@@ -483,12 +447,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface,
+            Expanded(
+              child: Center(
+                child: Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  maxLines: 2, // 최대 2줄까지 표시
+                  overflow: TextOverflow.ellipsis, // 텍스트가 넘치면 ... 처리
+                ),
               ),
             ),
             SizedBox(height: 8),
@@ -502,5 +472,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color:
+          Theme.of(context).scaffoldBackgroundColor, // 배경색을 스캐폴드 배경색과 동일하게 설정
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.withOpacity(0.2),
+              width: 1.0,
+            ),
+          ),
+          // 그림자 추가
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: _tabBar,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
